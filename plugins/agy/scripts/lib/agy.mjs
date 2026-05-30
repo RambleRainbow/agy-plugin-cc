@@ -69,9 +69,8 @@ function spawnAgy(cwd, args, onProgress) {
 }
 
 export async function runAppServerReview(cwd, { target, model, onProgress }) {
-  // Translate to an agy command. For review, we can just print a prompt.
-  // We'll simulate a review command.
-  return spawnAgy(cwd, ["--print", "Review the code"], onProgress);
+  const promptText = target.focusText ? `Please review my codebase. Instructions: ${target.focusText}` : "Please review my codebase.";
+  return spawnAgy(cwd, ["--print", promptText], onProgress);
 }
 
 export async function runAppServerTurn(cwd, { prompt, resumeThreadId, model, effort, sandbox, onProgress, persistThread, threadName }) {

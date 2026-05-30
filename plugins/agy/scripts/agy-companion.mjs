@@ -266,18 +266,12 @@ function buildNativeReviewTarget(target) {
 }
 
 function validateNativeReviewRequest(target, focusText) {
-  if (focusText.trim()) {
-    throw new Error(
-      `\`/agy:review\` now maps directly to the built-in reviewer and does not support custom focus text. Retry with \`/agy:adversarial-review ${focusText.trim()}\` for focused review instructions.`
-    );
-  }
-
   const nativeTarget = buildNativeReviewTarget(target);
   if (!nativeTarget) {
     throw new Error("This `/agy:review` target is not supported by the built-in reviewer. Retry with `/agy:adversarial-review` for custom targeting.");
   }
 
-  return nativeTarget;
+  return { ...nativeTarget, focusText };
 }
 
 function renderStatusPayload(report, asJson) {
