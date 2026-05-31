@@ -1,18 +1,30 @@
-# Antigravity CLI plugin for Claude Code
+# Agy Plugin for Claude Code
 
-Use Antigravity CLI (`agy`) from inside Claude Code.
+Use [Agy (Antigravity CLI)](https://antigravity.google/product/antigravity-cli) from inside Claude Code to delegate tasks or run code reviews.
+
+## What You Get
+
+- `/agy:run` to delegate a task to Agy
+- `/agy:review` to run a code review via Agy
+- `/agy:setup` to check whether Agy is installed
 
 ## Requirements
 
-- **Node.js 18.18 or later**
-- **Antigravity CLI installed** (`agy` in your PATH)
+- **Agy (Antigravity CLI)** installed and on your PATH.
+  - Install from [antigravity.google](https://antigravity.google/product/antigravity-cli)
 
 ## Install
 
-Add the plugin locally:
+Add the marketplace in Claude Code:
 
 ```bash
-/plugin install ./agy-plugin-cc
+/plugin marketplace add RambleRainbow/agy-plugin-cc
+```
+
+Install the plugin:
+
+```bash
+/plugin install agy@agy-plugin-cc
 ```
 
 Reload plugins:
@@ -21,40 +33,54 @@ Reload plugins:
 /reload-plugins
 ```
 
+Then run:
+
+```bash
+/agy:setup
+```
+
+`/agy:setup` will tell you whether Agy is installed and ready.
+
 ## Usage
 
-### `/agy:ask`
+### `/agy:run`
 
-Runs a single prompt non-interactively using `agy --print`.
-
-Examples:
-```bash
-/agy:ask "Write a hello world script in Python"
-```
-
-### `/agy:interactive`
-
-Starts an interactive prompt session using `agy --prompt-interactive`.
+Delegates a task to Agy. Use it when you want Agy to investigate a bug, try a fix, or do any coding work.
 
 Examples:
+
 ```bash
-/agy:interactive "Let's build a react app"
+/agy:run investigate why the tests are failing
+/agy:run fix the auth bug with the smallest safe patch
+/agy:run --continue
 ```
 
-### `/agy:continue`
+Use `--continue` to resume Agy's most recent conversation.
 
-Continues the most recent `agy` conversation.
+Press `ctrl+b` during execution to move the task to the background.
+
+### `/agy:review`
+
+Runs a code review on your current uncommitted changes via Agy.
 
 Examples:
+
 ```bash
-/agy:continue
+/agy:review
+/agy:review --base main
+/agy:review look for race conditions
 ```
 
-### `/agy:conversation`
+Use `--base <ref>` to review your branch against a base branch.
 
-Resumes a previous `agy` conversation by ID.
+### `/agy:setup`
 
-Examples:
+Checks whether Agy is installed and available on your system.
+
 ```bash
-/agy:conversation <id>
+/agy:setup
 ```
+
+## How It Works
+
+This plugin wraps the [Agy CLI](https://antigravity.google/product/antigravity-cli) using `agy --print` for non-interactive execution. It delegates tasks through Claude Code's native subagent mechanism, making Agy available as a slash command without leaving your current workflow.

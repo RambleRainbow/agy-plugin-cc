@@ -1,37 +1,23 @@
 ---
-description: Check whether the local Agy CLI is ready and optionally toggle the stop-time review gate
-argument-hint: '[--enable-review-gate|--disable-review-gate]'
-allowed-tools: Bash(node:*), Bash(npm:*), AskUserQuestion
+description: "Check whether Agy (Antigravity CLI) is installed and ready to use"
+allowed-tools: Bash(which:*), Bash(agy:*)
+disable-model-invocation: true
 ---
 
-Run:
+Check whether Agy is installed and available.
 
-```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/agy-companion.mjs" setup --json $ARGUMENTS
-```
+Steps:
 
-If the result says Agy is unavailable and npm is available:
-- Use `AskUserQuestion` exactly once to ask whether Claude should install Agy now.
-- Put the install option first and suffix it with `(Recommended)`.
-- Use these two options:
-  - `Install Agy (Recommended)`
-  - `Skip for now`
-- If the user chooses install, run:
+1. Check if `agy` is on PATH:
+   ```bash
+   which agy
+   ```
 
-```bash
-npm install -g @openai/agy
-```
+2. If `agy` is found, verify it works:
+   ```bash
+   agy --help
+   ```
 
-- Then rerun:
-
-```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/agy-companion.mjs" setup --json $ARGUMENTS
-```
-
-If Agy is already installed or npm is unavailable:
-- Do not ask about installation.
-
-Output rules:
-- Present the final setup output to the user.
-- If installation was skipped, present the original setup output.
-- If Agy is installed but not authenticated, preserve the guidance to run `!agy login`.
+3. Report the result:
+   - If `agy` is found and `--help` succeeds: **✅ Agy is installed and ready.** Show the path and available options.
+   - If `agy` is not found: **❌ Agy is not installed.** Tell the user to install it from https://antigravity.google/product/antigravity-cli

@@ -1,49 +1,20 @@
 ---
-description: Delegate investigation, an explicit fix request, or follow-up rescue work to the Agy rescue subagent
-argument-hint: "[--background|--wait] [--resume|--fresh] [--model <model|spark>] [--effort <none|minimal|low|medium|high|xhigh>] [what Agy should investigate, solve, or continue]"
-allowed-tools: Bash(node:*), AskUserQuestion, Agent
+description: "Delegate a task to Agy (Antigravity CLI) for investigation, fixes, or general coding work"
+argument-hint: "[--background] [--continue] [what Agy should do]"
+allowed-tools: Bash(agy:*), AskUserQuestion, Agent
 ---
 
-Invoke the `agy:agy-rescue` subagent via the `Agent` tool (`subagent_type: "agy:agy-rescue"`), forwarding the raw user request as the prompt.
-`agy:agy-rescue` is a subagent, not a skill — do not call `Skill(agy:agy-rescue)` (no such skill) or `Skill(agy:run)` (that re-enters this command and hangs the session). The command runs inline so the `Agent` tool stays in scope; forked general-purpose subagents do not expose it.
+Invoke the `agy:agy-agent` subagent via the `Agent` tool (`subagent_type: "agy:agy-agent"`), forwarding the raw user request as the prompt.
+
 The final user-visible response must be Agy's output verbatim.
 
 Raw user request:
 $ARGUMENTS
 
-Execution mode:
+Execution rules:
 
-- If the request includes `--background`, run the `agy:agy-rescue` subagent in the background.
-- If the request includes `--wait`, run the `agy:agy-rescue` subagent in the foreground.
-- If neither flag is present, default to foreground.
-- `--background` and `--wait` are execution flags for Claude Code. Do not forward them to `task`, and do not treat them as part of the natural-language task text.
-- `--model` and `--effort` are runtime-selection flags. Preserve them for the forwarded `task` call, but do not treat them as part of the natural-language task text.
-- If the request includes `--resume`, do not ask whether to continue. The user already chose.
-- If the request includes `--fresh`, do not ask whether to continue. The user already chose.
-- Otherwise, before starting Agy, check for a resumable rescue thread from this Claude session by running:
-
-```bash
-node "${CLAUDE_PLUGIN_ROOT}/scripts/agy-companion.mjs" task-resume-candidate --json
-```
-
-- If that helper reports `available: true`, use `AskUserQuestion` exactly once to ask whether to continue the current Agy thread or start a new one.
-- The two choices must be:
-  - `Continue current Agy thread`
-  - `Start a new Agy thread`
-- If the user is clearly giving a follow-up instruction such as "continue", "keep going", "resume", "apply the top fix", or "dig deeper", put `Continue current Agy thread (Recommended)` first.
-- Otherwise put `Start a new Agy thread (Recommended)` first.
-- If the user chooses continue, add `--resume` before routing to the subagent.
-- If the user chooses a new thread, add `--fresh` before routing to the subagent.
-- If the helper reports `available: false`, do not ask. Route normally.
-
-Operating rules:
-
-- The subagent is a thin forwarder only. It should use one `Bash` call to invoke `node "${CLAUDE_PLUGIN_ROOT}/scripts/agy-companion.mjs" task ...` and return that command's stdout as-is.
-- Return the Agy companion stdout verbatim to the user.
-- Do not paraphrase, summarize, rewrite, or add commentary before or after it.
-- Do not ask the subagent to inspect files, monitor progress, poll `/agy:status`, fetch `/agy:result`, call `/agy:cancel`, summarize output, or do follow-up work of its own.
-- Leave `--effort` unset unless the user explicitly asks for a specific reasoning effort.
-- Leave the model unset unless the user explicitly asks for one. If they ask for `spark`, map it to `gpt-5.3-agy-spark`.
-- Leave `--resume` and `--fresh` in the forwarded request. The subagent handles that routing when it builds the `task` command.
-- If the helper reports that Agy is missing or unauthenticated, stop and tell the user to run `/agy:setup`.
-- If the user did not supply a request, ask what Agy should investigate or fix.
+- If the request includes `--background`, run the `agy:agy-agent` subagent in the background.
+- If the request includes `--continue`, include the `--continue` flag when forwarding to the subagent. This tells Agy to resume its most recent conversation.
+- `--background` and `--continue` are execution flags. Do not treat them as part of the natural-language task text.
+- If the user did not supply a task description (and `--continue` is not set), ask what Agy should investigate or do.
+- Return the Agy output verbatim to the user. Do not paraphrase, summarize, or add commentary.
