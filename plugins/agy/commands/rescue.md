@@ -1,5 +1,5 @@
 ---
-description: "Delegate a task to Agy (Antigravity CLI) for investigation, fixes, or general coding work"
+description: "Delegate investigation, a fix request, or follow-up work to Agy (Antigravity CLI)"
 argument-hint: "[--background] [--continue] [what Agy should do]"
 allowed-tools: Bash(agy:*), AskUserQuestion, Agent
 ---
