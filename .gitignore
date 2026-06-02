@@ -1,1 +1,25 @@
+# Dependencies
+node_modules/
+
+# Reference implementation (local dev only)
 codex-plugin-cc-ref/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agy local state
+.antigravitycli/
+
+# Claude Code local state
+.claude/
+
+# Stale artifacts
+analysis.md
