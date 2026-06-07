@@ -1,6 +1,6 @@
 ---
 description: "Run a code review on your current changes using Agy (Antigravity CLI)"
-argument-hint: "[--base <ref>] [optional focus instructions]"
+argument-hint: "[--model <model>] [--base <ref>] [optional focus instructions]"
 allowed-tools: Bash(git:*), Bash(agy:*)
 disable-model-invocation: true
 ---
@@ -9,7 +9,11 @@ Run a code review via Agy. This command gathers the current git diff and asks Ag
 
 Steps:
 
-1. Determine what to review:
+1. Parse flags:
+   - `--model <name>` → add `--model <name>` to the agy command.
+   - `--base <ref>` → review diff against that base ref.
+
+2. Determine what to review:
    - If `--base <ref>` is provided, review the diff between the current branch and `<ref>`:
      ```bash
      git diff <ref>...HEAD
@@ -19,9 +23,9 @@ Steps:
      git diff HEAD
      ```
 
-2. If the diff is empty, tell the user there are no changes to review and stop.
+3. If the diff is empty, tell the user there are no changes to review and stop.
 
-3. Construct the review prompt. If the user provided focus text after the flags, include it:
+4. Construct the review prompt. If the user provided focus text after the flags, include it:
    ```
    Please review the following code changes. Focus on bugs, security issues, performance problems, and code quality.
    
@@ -31,9 +35,9 @@ Steps:
    <diff output>
    ```
 
-4. Run Agy with the constructed prompt:
+5. Run Agy with the constructed prompt:
    ```bash
-   agy --print "<review prompt>" --dangerously-skip-permissions
+   agy --print "<review prompt>" --dangerously-skip-permissions [--model <name> if specified]
    ```
 
-5. Return the review output verbatim.
+6. Return the review output verbatim.

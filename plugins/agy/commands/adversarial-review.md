@@ -1,6 +1,6 @@
 ---
 description: "Run a steerable adversarial review that challenges design decisions, tradeoffs, and assumptions"
-argument-hint: "[--base <ref>] [specific areas to challenge]"
+argument-hint: "[--model <model>] [--base <ref>] [specific areas to challenge]"
 allowed-tools: Bash(git:*), Bash(agy:*)
 disable-model-invocation: true
 ---
@@ -9,7 +9,11 @@ Run an adversarial code review via Agy. Unlike `/agy:review`, this review active
 
 Steps:
 
-1. Determine what to review:
+1. Parse flags:
+   - `--model <name>` → add `--model <name>` to the agy command.
+   - `--base <ref>` → review diff against that base ref.
+
+2. Determine what to review:
    - If `--base <ref>` is provided, review the diff between the current branch and `<ref>`:
      ```bash
      git diff <ref>...HEAD
@@ -19,11 +23,11 @@ Steps:
      git diff HEAD
      ```
 
-2. If the diff is empty, tell the user there are no changes to review and stop.
+3. If the diff is empty, tell the user there are no changes to review and stop.
 
-3. Extract any focus text the user provided after the flags (e.g., "challenge whether this was the right caching design").
+4. Extract any focus text the user provided after the flags (e.g., "challenge whether this was the right caching design").
 
-4. Construct the adversarial review prompt:
+5. Construct the adversarial review prompt:
    ```
    You are performing an adversarial code review. Your job is NOT to just check for bugs — instead, actively challenge the design and implementation choices.
 
@@ -40,9 +44,9 @@ Steps:
    <diff output>
    ```
 
-5. Run Agy with the constructed prompt:
+6. Run Agy with the constructed prompt:
    ```bash
-   agy --print "<adversarial review prompt>" --dangerously-skip-permissions
+   agy --print "<adversarial review prompt>" --dangerously-skip-permissions [--model <name> if specified]
    ```
 
-6. Return the review output verbatim.
+7. Return the review output verbatim.
